@@ -2,24 +2,29 @@ import React from "react";
 import styled, { keyframes } from 'styled-components';
 
 function Wheel({names}) {
+  const l = names.length;
    return (
      <PopUp>
       <Circle>
-      names.map((name,i)=>{
+      { names.map((name,i)=>{
         let left = (50 - 35*Math.cos(-0.5 * Math.PI - 2*(1/l)*i*Math.PI)).toFixed(4) + "%";
         let top = (50 + 35*Math.sin(-0.5 * Math.PI - 2*(1/l)*i*Math.PI)).toFixed(4) + "%";
         let divStyle = {
         left: left,
         top: top,
         }
-        <div className='name' id={name} style={divStyle}></div>
-      });
+        if(i === l-1){
+          divStyle['color'] = 'red';
+        }
+        return (<Icon id={name} style={divStyle} key={name+i}>{name}</Icon>);
+      })
+      }
       </Circle>
     </PopUp>
    );
 }
 
-const PopUp = styled.nav`
+const PopUp = styled.div`
   position: fixed;
   border-radius: 50%;
   background-color: white;
@@ -39,5 +44,33 @@ const Circle = styled.div`
   height: 250px;
   opacity: 1;
 `;
+const rotate = keyframes`
+  from {
+    transform: scale(1);
+  }
 
-export defaul Wheel;
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+`;
+const Icon = styled.div`
+    color: black;
+    display: block;
+    height: 35px;
+    width: 35px;
+    line-height: 20px;
+    margin-left: -10px;
+    margin-top: -10px;
+    position: absolute;
+    text-align: center;
+
+  &:hover {
+    animation: ${rotate} 1s linear;
+    animation-iteration-count: 1;
+  }`;
+
+export default Wheel;
