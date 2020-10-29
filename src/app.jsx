@@ -6,15 +6,20 @@ import regeneratorRuntime from "regenerator-runtime";
 class App extends React.Component {
   constructor(props){
     super(props);
+
+    const RANDOM = 'random';
+    const NO_DUPLICATES = 'no duplicates';
+    const PROBABILITY = 'probability';
+
     this.state = {
       names: ['Abel', 'Aliona', 'Apekshya', 'Bradley', 'Candace', 'Chris P', 'Chris R', 'Cody', 'Collin', 'Debbie', 'Dustin','Edgar', 'Gina', 'Jason', 'Kelson', 'Malik', 'Matthew', 'Mitchell', 'Nick', 'Paul', 'Randall', 'Ty'],
       currentNames: [
-        ['Abel', 1], ['Aliona',1], ['Apekshya',1], ['Bradley',1], ['Candace',1], ['Chris P',1], ['Chris R',1], ['Cody',1], ['Collin',1], ['Debbie',1], ['Dustin',1],['Edgar',1], ['Gina',1], ['Jason',1], ['Kelson',1], ['Malik',1], ['Matthew',1],
-        ['Mitchell',1],
-        ['Nick',1],
-        ['Paul',1],
-        ['Randall',1], ['Ty',1]],
-      test: {},
+        ['Abel', 1, false], ['Aliona',1,false], ['Apekshya',1,false], ['Bradley',1,false], ['Candace',1,false], ['Chris P',1,false], ['Chris R',1,false], ['Cody',1,false], ['Collin',1,false], ['Debbie',1,false], ['Dustin',1,false],['Edgar',1,false], ['Gina',1,false], ['Jason',1,false], ['Kelson',1,false], ['Malik',1,false], ['Matthew',1,false],
+        ['Mitchell',1,false],
+        ['Nick',1,false],
+        ['Paul',1,false],
+        ['Randall',1,false], ['Ty',1,false]],
+        selectionType: RANDOM
     }
     this.handleSpinClick = this.handleSpinClick.bind(this);
     this.shiftNames = this.shiftNames.bind(this);
@@ -22,16 +27,36 @@ class App extends React.Component {
 
   handleSpinClick(e){
     e.preventDefault();
-    let count = 0;
+    randomSelection();
+    if(this.state.selectionType === PROBABILITY){
+      probabilitySelection();
+    }else if(this.state.selectionType === NO_DUPLICATES){
+      noDuplicatesSelection();
+    }
+    updateSelection();
+  }
+
+  updateSelection(){
+    let currentNames = this.state.currentNames;
+    currentNames[0][1] *= .5;
+    currentNames[0][2] = true;
+    this.setState({
+      currentNames: currentNames
+    });
+  }
+
+  randomSelection(){
     const maxNames = this.state.names.length;
-    const shiftBy = Math.floor((Math.random()*maxNames));
     let rotations = Math.floor((Math.random()*50*maxNames)+1);
     const gen = this.shiftNames(rotations);
-    let first;
     for(let i=0 ; i < rotations; i++){
       gen.next();
     }
-    first = this.state.currentNames[0];
+    return this.state.currentNames[0];
+  }
+
+  probabilitySelection(){
+    let first = randomSelection();
     if(first[1] !== 1){
       const probability = first[1];
       const spinAgain = Math.floor(Math.random()*20*probability) > 7 ? true : false;
@@ -41,8 +66,13 @@ class App extends React.Component {
         }
       }
     }
-    let currentNames = this.state.currentNames;
-    currentNames[0][1] *= .5;
+  }
+
+  noDuplicatesSelection(){
+    let first = randomSelection();
+    if(first[2]){
+      noDuplicatesSelection();
+    }
   }
 
   *shiftNames(rotations){
