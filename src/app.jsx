@@ -7,11 +7,6 @@ import regeneratorRuntime from "regenerator-runtime";
 class App extends React.Component {
   constructor(props){
     super(props);
-
-    const RANDOM = 'random';
-    const NO_DUPLICATES = 'no duplicates';
-    const PROBABILITY = 'probability';
-
     this.state = {
       names: ['Abel', 'Aliona', 'Apekshya', 'Bradley', 'Candace', 'Chris P', 'Chris R', 'Cody', 'Collin', 'Debbie', 'Dustin','Edgar', 'Gina', 'Jason', 'Kelson', 'Malik', 'Matthew', 'Mitchell', 'Nick', 'Paul', 'Randall', 'Ty'],
       currentNames: [
@@ -20,24 +15,32 @@ class App extends React.Component {
         ['Nick',1,false],
         ['Paul',1,false],
         ['Randall',1,false], ['Ty',1,false]],
-        selectionType: RANDOM
+        selectionType: "random"
     }
     this.handleSpinClick = this.handleSpinClick.bind(this);
     this.shiftNames = this.shiftNames.bind(this);
     this.randomSelection = this.randomSelection.bind(this);
     this.probabilitySelection = this.probabilitySelection.bind(this);
     this.noDuplicatesSelection = this.noDuplicatesSelection.bind(this);
+    this.randomChange = this.randomChange.bind(this);
   }
 
   handleSpinClick(e){
     e.preventDefault();
-    this.randomSelection();
-    if(this.state.selectionType === this.PROBABILITY){
+    if(this.state.selectionType === "random"){
+      this.randomSelection();
+    }else if(this.state.selectionType === "probability"){
       this.probabilitySelection();
-    }else if(this.state.selectionType === this.NO_DUPLICATES){
+    }else if(this.state.selectionType === "noDuplicates"){
       this.noDuplicatesSelection();
     }
     this.updateSelection();
+  }
+
+  randomChange(value){
+    this.setState({
+      selectionType: value
+    });
   }
 
   updateSelection(){
@@ -60,20 +63,23 @@ class App extends React.Component {
   }
 
   probabilitySelection(){
-    let first = randomSelection();
+    let first = this.randomSelection();
     if(first[1] !== 1){
       const probability = first[1];
       const spinAgain = Math.floor(Math.random()*20*probability) > 7 ? true : false;
       if(spinAgain){
-       randomSelection();
+       this.randomSelection();
       }
     }
   }
 
-  noDuplicatesSelection(){
-    let first = randomSelection();
+  noDuplicatesSelection(count=0){
+    if(count > this.state.currentNames.length){
+      return;
+    }
+    let first = this.randomSelection();
     if(first[2]){
-      noDuplicatesSelection();
+      this.noDuplicatesSelection(++count);
     }
   }
 
@@ -95,7 +101,7 @@ class App extends React.Component {
     return (
       <>
         <button onClick={this.handleSpinClick}>Spin</button>
-        <RandomType></RandomType>
+        <RandomType randomChange={this.randomChange}></RandomType>
         <Wheel names={this.state.currentNames}></Wheel>
         <Axel></Axel>
       </>
