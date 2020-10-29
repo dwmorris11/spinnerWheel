@@ -1,5 +1,6 @@
 import React from 'react';
 import Wheel from './wheel';
+import RandomType from './randomtype';
 import styled from 'styled-components';
 import regeneratorRuntime from "regenerator-runtime";
 
@@ -23,17 +24,20 @@ class App extends React.Component {
     }
     this.handleSpinClick = this.handleSpinClick.bind(this);
     this.shiftNames = this.shiftNames.bind(this);
+    this.randomSelection = this.randomSelection.bind(this);
+    this.probabilitySelection = this.probabilitySelection.bind(this);
+    this.noDuplicatesSelection = this.noDuplicatesSelection.bind(this);
   }
 
   handleSpinClick(e){
     e.preventDefault();
-    randomSelection();
-    if(this.state.selectionType === PROBABILITY){
-      probabilitySelection();
-    }else if(this.state.selectionType === NO_DUPLICATES){
-      noDuplicatesSelection();
+    this.randomSelection();
+    if(this.state.selectionType === this.PROBABILITY){
+      this.probabilitySelection();
+    }else if(this.state.selectionType === this.NO_DUPLICATES){
+      this.noDuplicatesSelection();
     }
-    updateSelection();
+    this.updateSelection();
   }
 
   updateSelection(){
@@ -61,9 +65,7 @@ class App extends React.Component {
       const probability = first[1];
       const spinAgain = Math.floor(Math.random()*20*probability) > 7 ? true : false;
       if(spinAgain){
-        for(let i=0; i < rotations; i++){
-          gen.next();
-        }
+       randomSelection();
       }
     }
   }
@@ -93,6 +95,7 @@ class App extends React.Component {
     return (
       <>
         <button onClick={this.handleSpinClick}>Spin</button>
+        <RandomType></RandomType>
         <Wheel names={this.state.currentNames}></Wheel>
         <Axel></Axel>
       </>
