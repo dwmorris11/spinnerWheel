@@ -1,5 +1,6 @@
 import React from 'react';
 import Wheel from './wheel';
+import RandomType from './randomtype';
 import styled from 'styled-components';
 import regeneratorRuntime from "regenerator-runtime";
 
@@ -9,40 +10,77 @@ class App extends React.Component {
     this.state = {
       names: ['Abel', 'Aliona', 'Apekshya', 'Bradley', 'Candace', 'Chris P', 'Chris R', 'Cody', 'Collin', 'Debbie', 'Dustin','Edgar', 'Gina', 'Jason', 'Kelson', 'Malik', 'Matthew', 'Mitchell', 'Nick', 'Paul', 'Randall', 'Ty'],
       currentNames: [
-        ['Abel', 1], ['Aliona',1], ['Apekshya',1], ['Bradley',1], ['Candace',1], ['Chris P',1], ['Chris R',1], ['Cody',1], ['Collin',1], ['Debbie',1], ['Dustin',1],['Edgar',1], ['Gina',1], ['Jason',1], ['Kelson',1], ['Malik',1], ['Matthew',1],
-        ['Mitchell',1],
-        ['Nick',1],
-        ['Paul',1],
-        ['Randall',1], ['Ty',1]],
-      test: {},
+        ['Abel', 1, false], ['Aliona',1,false], ['Apekshya',1,false], ['Bradley',1,false], ['Candace',1,false], ['Chris P',1,false], ['Chris R',1,false], ['Cody',1,false], ['Collin',1,false], ['Debbie',1,false], ['Dustin',1,false],['Edgar',1,false], ['Gina',1,false], ['Jason',1,false], ['Kelson',1,false], ['Malik',1,false], ['Matthew',1,false],
+        ['Mitchell',1,false],
+        ['Nick',1,false],
+        ['Paul',1,false],
+        ['Randall',1,false], ['Ty',1,false]],
+        selectionType: "random"
     }
     this.handleSpinClick = this.handleSpinClick.bind(this);
     this.shiftNames = this.shiftNames.bind(this);
+    this.randomSelection = this.randomSelection.bind(this);
+    this.probabilitySelection = this.probabilitySelection.bind(this);
+    this.noDuplicatesSelection = this.noDuplicatesSelection.bind(this);
+    this.randomChange = this.randomChange.bind(this);
   }
 
   handleSpinClick(e){
     e.preventDefault();
-    let count = 0;
+    if(this.state.selectionType === "random"){
+      this.randomSelection();
+    }else if(this.state.selectionType === "probability"){
+      this.probabilitySelection();
+    }else if(this.state.selectionType === "noDuplicates"){
+      this.noDuplicatesSelection();
+    }
+    this.updateSelection();
+  }
+
+  randomChange(value){
+    this.setState({
+      selectionType: value
+    });
+  }
+
+  updateSelection(){
+    let currentNames = this.state.currentNames;
+    currentNames[0][1] *= .5;
+    currentNames[0][2] = true;
+    this.setState({
+      currentNames: currentNames
+    });
+  }
+
+  randomSelection(){
     const maxNames = this.state.names.length;
-    const shiftBy = Math.floor((Math.random()*maxNames));
     let rotations = Math.floor((Math.random()*50*maxNames)+1);
     const gen = this.shiftNames(rotations);
-    let first;
     for(let i=0 ; i < rotations; i++){
       gen.next();
     }
-    first = this.state.currentNames[0];
+    return this.state.currentNames[0];
+  }
+
+  probabilitySelection(){
+    let first = this.randomSelection();
     if(first[1] !== 1){
       const probability = first[1];
       const spinAgain = Math.floor(Math.random()*20*probability) > 7 ? true : false;
       if(spinAgain){
-        for(let i=0; i < rotations; i++){
-          gen.next();
-        }
+       this.randomSelection();
       }
     }
-    let currentNames = this.state.currentNames;
-    currentNames[0][1] *= .5;
+  }
+
+  noDuplicatesSelection(count=0){
+    if(count > this.state.currentNames.length){
+      return;
+    }
+    let first = this.randomSelection();
+    if(first[2]){
+      this.noDuplicatesSelection(++count);
+    }
   }
 
   *shiftNames(rotations){
@@ -63,6 +101,7 @@ class App extends React.Component {
     return (
       <>
         <button onClick={this.handleSpinClick}>Spin</button>
+        <RandomType randomChange={this.randomChange}></RandomType>
         <Wheel names={this.state.currentNames}></Wheel>
         <Axel></Axel>
       </>
