@@ -21,7 +21,7 @@ class BarChart extends React.Component {
 
   render(){
     return(
-      <svg ref={node => this.node = node} width={500} height={500}></svg>
+      <svg ref={node => this.node = node} width={550} height={1000}></svg>
     );
   }
 }

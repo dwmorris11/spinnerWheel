@@ -8,9 +8,9 @@ var margin = ({});
 margin.top = 30;
 margin.right = 0;
 margin.bottom = 10;
-margin.left = 30;
+margin.left = 50;
 
-var width = 50;
+var width = 100;
 var height = Math.ceil((data.length + 0.1) * barHeight) + margin.top + margin.bottom;
 
 var x = d3.scaleLinear()
@@ -22,7 +22,7 @@ var y = d3.scaleBand()
   .rangeRound([margin.top, height - margin.bottom])
   .padding(0.1);
 
-var format = x.tickFormat(20, data.format);
+var format = x.tickFormat(1, 'd');
 
 var yAxis = g => g
     .attr("transform", `translate(${margin.left},0)`)
@@ -58,10 +58,10 @@ var xAxis = g => g
       .attr("dy", "0.35em")
       .attr("dx", -4)
       .text(d => format(d.value))
-    .call(text => text.filter(d => x(d.value) - x(0) < 20) // short bars
-      .attr("dx", +4)
-      .attr("fill", "black")
-      .attr("text-anchor", "start"));
+    // .call(text => text.filter(d => x(d.value) - x(0) < 20) // short bars
+    //   .attr("dx", +4)
+    //   .attr("fill", "black")
+    //   .attr("text-anchor", "start"));
 
   select(node)
       .append("g")

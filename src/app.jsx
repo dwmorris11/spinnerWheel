@@ -126,9 +126,15 @@ class App extends React.Component {
       <>
         <button onClick={this.handleSpinClick}>Spin</button>
         <RandomType randomChange={this.randomChange}></RandomType>
-        <BarChart data={this.state.barChartNames}></BarChart>
-        <Wheel names={this.state.currentNames}></Wheel>
-        <Axel></Axel>
+        <div style={{display: 'flex', justifyContent: 'space-evenly'}}>
+          <div>
+            <BarChart data={this.state.barChartNames}></BarChart>
+          </div>
+          <div>
+            <Wheel names={this.state.currentNames}></Wheel>
+            <Axel></Axel>
+          </div>
+        </div>
       </>
     )
   }
