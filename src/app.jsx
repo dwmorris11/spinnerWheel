@@ -1,6 +1,7 @@
 import React from 'react';
 import Wheel from './wheel';
 import RandomType from './randomtype';
+import BarChart from './barchart.jsx';
 import styled from 'styled-components';
 import regeneratorRuntime from "regenerator-runtime";
 
@@ -102,6 +103,7 @@ class App extends React.Component {
       <>
         <button onClick={this.handleSpinClick}>Spin</button>
         <RandomType randomChange={this.randomChange}></RandomType>
+        <BarChart></BarChart>
         <Wheel names={this.state.currentNames}></Wheel>
         <Axel></Axel>
       </>
