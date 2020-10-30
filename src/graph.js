@@ -1,8 +1,9 @@
 var d3 = require("d3");
 import { select } from 'd3-selection';
 
+const graph = (node, data) => {
+
 var barHeight = 25;
-var data = [{"name": "Dustin", "value": 6},{"name": "Fred", "value": 5}];
 var margin = ({});
 margin.top = 30;
 margin.right = 0;
@@ -31,8 +32,6 @@ var xAxis = g => g
   .attr("transform", `translate(0,${margin.top})`)
   .call(d3.axisTop(x).ticks(width / 80, data.format))
   .call(g => g.select(".domain").remove());
-
-const graph = (node) => {
 
   select(node)
       .append("g")

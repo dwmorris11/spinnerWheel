@@ -16,7 +16,7 @@ class BarChart extends React.Component {
 
   createBarChart(){
     const node = this.node;
-    graph(node);
+    graph(node, this.props.data);
   }
 
   render(){
