@@ -1,6 +1,7 @@
 import React from 'react';
 import Wheel from './wheel';
 import RandomType from './randomtype';
+import BarChart from './barchart.jsx';
 import styled from 'styled-components';
 import regeneratorRuntime from "regenerator-runtime";
 
@@ -15,7 +16,16 @@ class App extends React.Component {
         ['Nick',1,false],
         ['Paul',1,false],
         ['Randall',1,false], ['Ty',1,false]],
-        selectionType: "random"
+      selectionType: "random",
+      barChartNames: [
+        { 'name': 'Abel', 'value': 0 }, { 'name': 'Aliona', 'value': 0 }, {'name': 'Apekshya', 'value': 0 }, { 'name': 'Bradley', 'value': 0}, {'name': 'Candace', 'value': 0},{'name': 'Chris P', 'value': 0 },
+        { 'name': 'Chris R','value': 0}, {'name': 'Cody', 'value': 0}, {'name': 'Collin', 'value': 0},
+        { 'name': 'Debbie', 'value': 0 },{'name': 'Dustin','value': 0}, {'name': 'Edgar','value': 0},
+        { 'name': 'Gina', 'value':0}, {'name': 'Jason', 'value': 0},{'name': 'Kelson','value':0},
+        { 'name': 'Malik','value': 0},{'name': 'Matthew', 'value': 0},{'name': 'Mitchell','value': 0},
+        { 'name': 'Nick', 'value': 0},{'name': 'Paul', 'value':0},{'name': 'Randall','value':0},
+        { 'name': 'Ty', 'value': 0}]
+
     }
     this.handleSpinClick = this.handleSpinClick.bind(this);
     this.shiftNames = this.shiftNames.bind(this);
@@ -23,6 +33,7 @@ class App extends React.Component {
     this.probabilitySelection = this.probabilitySelection.bind(this);
     this.noDuplicatesSelection = this.noDuplicatesSelection.bind(this);
     this.randomChange = this.randomChange.bind(this);
+    this.findBarChartName = this.findBarChartName.bind(this);
   }
 
   handleSpinClick(e){
@@ -47,9 +58,22 @@ class App extends React.Component {
     let currentNames = this.state.currentNames;
     currentNames[0][1] *= .5;
     currentNames[0][2] = true;
+    const barChartNameIndex = this.findBarChartName(currentNames[0][0]);
+    let barChartNames = this.state.barChartNames;
+    barChartNames[barChartNameIndex]['value'] += 1;
     this.setState({
-      currentNames: currentNames
+      currentNames: currentNames,
+      barChartNames: barChartNames
     });
+    console.log(this.state.barChartNames);
+  }
+
+  findBarChartName(name){
+    for(let i = 0; i < this.state.barChartNames.length; i++){
+      if(this.state.barChartNames[i]['name'] === name){
+        return i;
+      }
+    }
   }
 
   randomSelection(){
@@ -102,8 +126,15 @@ class App extends React.Component {
       <>
         <button onClick={this.handleSpinClick}>Spin</button>
         <RandomType randomChange={this.randomChange}></RandomType>
-        <Wheel names={this.state.currentNames}></Wheel>
-        <Axel></Axel>
+        <div style={{display: 'flex', justifyContent: 'space-evenly'}}>
+          <div>
+            <BarChart data={this.state.barChartNames}></BarChart>
+          </div>
+          <div>
+            <Wheel names={this.state.currentNames}></Wheel>
+            <Axel></Axel>
+          </div>
+        </div>
       </>
     )
   }
