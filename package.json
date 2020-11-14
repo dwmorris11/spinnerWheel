@@ -19,12 +19,16 @@
   },
   "homepage": "https://github.com/dwmorris11/spinnerWheel#readme",
   "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
     "d3": "^6.2.0",
     "http-server": "^0.12.3",
+    "mongoose": "^5.10.14",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "regenerator-runtime": "^0.13.7",
-    "styled-components": "^5.2.0"
+    "styled-components": "^5.2.0",
+    "validate.js": "^0.13.1",
+    "xss": "^1.0.8"
   },
   "devDependencies": {
     "@svgr/webpack": "^5.4.0",
