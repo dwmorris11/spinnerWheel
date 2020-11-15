@@ -91,5 +91,5 @@ const validateWheelValue = function(id, listId, wheelValue){
  }
 
 module.exports.validateUser = validateUser;
-module.exports.validateWheelValues = validateWheelValue;
+module.exports.validateWheelValue = validateWheelValue;
 module.exports.validateEmail = validateEmail;
