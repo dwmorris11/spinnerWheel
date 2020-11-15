@@ -1,4 +1,5 @@
 const { validateUser, validateEmail } = require('./validate.js');
+const jwt = require('jsonwebtoken');
 
 const createUser = function(req, res) {
     const isValidUser = validateUser(req.username, req.password);
@@ -17,14 +18,37 @@ const createUser = function(req, res) {
     }
 };
 
-// middleware function to check for logged-in users
-const sessionChecker = (req, res, next) => {
-    if (req.session.user && req.cookies.user_sid) {
-        res.redirect('/dashboard');
-    } else {
-        next();
-    }    
-};
-
-module.exports.sessionChecker = sessionChecker;
-module.exports.createUser = createUser;
+function generateToken(user) {
+    //1. Don't use password and other sensitive fields
+    //2. Use the information that are useful in other parts
+    if (!user) return null;
+   
+    var u = {
+      userId: user.userId,
+      name: user.name,
+      username: user.username,
+      isAdmin: user.isAdmin
+    };
+   
+    return jwt.sign(u, process.env.JWT_SECRET, {
+      expiresIn: 1000 * 60 * 60 * 24 * 7, // 1 week
+    });
+  }
+   
+  // return basic user details
+  function getCleanUser(user) {
+    if (!user) return null;
+   
+    return {
+      userId: user.userId,
+      name: user.name,
+      username: user.username,
+      isAdmin: user.isAdmin
+    };
+  }
+   
+  module.exports = {
+    generateToken,
+    getCleanUser, 
+    createUser,
+  };

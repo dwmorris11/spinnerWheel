@@ -1,50 +1,43 @@
+require('dotenv').config();
+const cors = require('cors');
+const jwt = require('jswebtoken');
 const mongoose = require('mongoose');
 const express = require('express');
 const xss = require('xss');
 const helmet = require('helmet');
-const session = require('express-session');
 const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
 const { User } = require('../database/schema.js');
 const { db } = require('../database/index.js');
 const { validateWheelValue } = require('./validate.js');
-const { store } = require('./session.js');
-const { createUser, sessionChecker } = require('./util.js');
+const { createUser, getCleanUser, generateToken } = require('./util.js');
 
 const app = express();
-const port = 80;
+const port = process.env.PORT || 80;
 
-app.set('trust proxy', 1);
+app.use(cors());
 app.use('../public/', express.static());
-app.use(cookieParser);
 app.use(bodyParser.JSON());
 app.use(helmet());
-app.use(session({
-    key: 'user_sid',
-    secret: 'supersecret',
-    cookie: {
-      maxAge: 1000 * 60 * 60 * 24 * 7 * 4, // 4 weeks
-      secure: process.env.NODE_ENV === 'production',
-      httpOnly: true
-    },
-    store: store,
-    resave: false,
-    saveUninitialized: true
-  }));
- 
-app.use((req, res, next) => {
-    if (req.cookies.user_sid && !req.session.user) {
-        res.clearCookie('user_sid');        
-    }
-    next();
-});
-
-/********************************************************************************************
- * HOME PAGE
- * ******************************************************************************************/
-app.get('/', sessionChecker, (req, res) => {
-    res.redirect('/login');
-});
+//middleware that checks if JWT token exists and verifies it if it does exist.
+//In all future routes, this helps to know if the request is authenticated or not.
+app.use(function (req, res, next) {
+    // check header or url parameters or post parameters for token
+    var token = req.headers['authorization'];
+    if (!token) return next(); //if no token, continue
+   
+    token = token.replace('Bearer ', '');
+    jwt.verify(token, process.env.JWT_SECRET, function (err, user) {
+      if (err) {
+        return res.status(401).json({
+          error: true,
+          message: "Invalid user."
+        });
+      } else {  
+        req.user = user; //set the user to req so other routes can use it
+        next();
+      }
+    });
+  });
 
 /********************************************************************************************
  * REGISTER A NEW USER
@@ -68,23 +61,70 @@ app.route('/register')
  * LOGIN
  * ******************************************************************************************/
 app.route('/login')
-    .get((req, res)=> {
-        res.sendFile(_dirname + '../public/login.html');
-    })
     .post((req, res) => {
         const username = xss(req.body.username);
         const password = xss(req.body.password);
+        if(!username || !password){
+            res.status(400).json({
+                error: true,
+                message: "Username and Password required."
+            });
+        }
         User.findOne({username: username}, function(err, user) {
             if(!user){
-                res.statusCode(400).send('user not found');
+                res.status(401).json({
+                    error: true,
+                    message: "Username not found"
+                });
             }else if (!user.validPassword(password)) {
-                res.statusCode(400).send('invalid password');
-            } else {
-                res.session.user = user.dataValues;
-                res.redirect('/dashboard');
-            }
+                res.status(401).json({
+                    error: true,
+                    message: 'Invalid password'});
+            } 
+            // TODO: get this from database
+            const token = generateToken(userData);
+            const userObj = getCleanUser(userData);
+            res.json({user: userObj, token});
         });
     });
+
+// verify the token and return it if it's valid
+app.get('/verifyToken', function (req, res) {
+  // check header or url parameters or post parameters for token
+  var token = req.query.token;
+  if (!token) {
+    return res.status(400).json({
+      error: true,
+      message: "Token is required."
+    });
+  }
+  // check token that was passed by decoding token using secret
+  jwt.verify(token, process.env.JWT_SECRET, function (err, user) {
+    if (err) return res.status(401).json({
+      error: true,
+      message: "Invalid token."
+    });
+ 
+    // return 401 status if the userId does not match.
+    if (user.userId !== userData.userId) {
+      return res.status(401).json({
+        error: true,
+        message: "Invalid user."
+      });
+    }
+    // get basic user details
+    var userObj = utils.getCleanUser(userData);
+    return res.json({ user: userObj, token });
+  });
+});
+
+
+   
+  // request handlers
+  app.get('/', (req, res) => {
+    if (!req.user) return res.status(401).json({ success: false, message: 'Invalid user to access it.' });
+    res.send();
+  });
 
   /******************************************************************************************
    * MAKE NEW LIST/UPDATE
@@ -106,4 +146,13 @@ app.route('/login')
 
   app.listen(port, () => {
       console.log("Server listening on port: ", port);
-  })
+  });
+
+  // static user details
+const userData = {
+    userId: "789789",
+    password: "123456",
+    name: "Clue Mediator",
+    username: "cluemediator",
+    isAdmin: true
+  };
