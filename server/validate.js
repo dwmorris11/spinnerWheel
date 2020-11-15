@@ -1,6 +1,5 @@
 const xss = require('xss');
 const validate = require('validate.js');
-const { ModuleFilenameHelpers } = require('webpack');
 
 const validateUser = function(username, password) {
     const cleanedUsername = xss(username);

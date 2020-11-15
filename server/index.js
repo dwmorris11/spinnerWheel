@@ -1,6 +1,7 @@
 require('dotenv').config();
 const cors = require('cors');
-const jwt = require('jswebtoken');
+const path = require('path');
+const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const express = require('express');
 const xss = require('xss');
@@ -12,11 +13,11 @@ const { validateWheelValue } = require('./validate.js');
 const { createUser, getCleanUser, generateToken } = require('./util.js');
 
 const app = express();
-const port = process.env.PORT || 80;
+const port = process.env.PORT || 4000;
 
 app.use(cors());
-app.use('../public/', express.static());
-app.use(bodyParser.JSON());
+app.use(express.static(path.join(__dirname, '..', 'public')));
+app.use(bodyParser.json());
 app.use(helmet());
 //middleware that checks if JWT token exists and verifies it if it does exist.
 //In all future routes, this helps to know if the request is authenticated or not.
@@ -43,19 +44,7 @@ app.use(function (req, res, next) {
  * REGISTER A NEW USER
  * ******************************************************************************************/
 app.route('/register')
-    .get(sessionChecker, (req, res) => {
-        res.sendFile(__dirname + '../public/register.html');
-    })
-    .post((req, res) => {
-       createUser(req, res);
-    })
-        .then(user => {
-            req.session.user = user.dataValues;
-            res.redirect('/dashboard');
-        })
-        .catch(error => {
-            res.redirect('/register');
-        });
+    .post((req, res) => createUser(req, res));
 
 /********************************************************************************************
  * LOGIN
@@ -106,7 +95,7 @@ app.get('/verifyToken', function (req, res) {
     });
  
     // return 401 status if the userId does not match.
-    if (user.userId !== userData.userId) {
+    if (user.id !== userData.id) {
       return res.status(401).json({
         error: true,
         message: "Invalid user."
@@ -118,9 +107,6 @@ app.get('/verifyToken', function (req, res) {
   });
 });
 
-
-   
-  // request handlers
   app.get('/', (req, res) => {
     if (!req.user) return res.status(401).json({ success: false, message: 'Invalid user to access it.' });
     res.send();
@@ -150,7 +136,7 @@ app.get('/verifyToken', function (req, res) {
 
   // static user details
 const userData = {
-    userId: "789789",
+    id: "789789",
     password: "123456",
     name: "Clue Mediator",
     username: "cluemediator",

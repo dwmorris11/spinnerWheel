@@ -1,18 +1,25 @@
 const { validateUser, validateEmail } = require('./validate.js');
 const jwt = require('jsonwebtoken');
+const { User } = require('../database/schema');
+const xss = require('xss');
 
-const createUser = function(req, res) {
+const createUser = async function(req, res) {
     const isValidUser = validateUser(req.username, req.password);
     const isValidEmail = validateEmail(req.username, req.email);
     if(isValidUser === undefined && isValidEmail === undefined){
-      var new_user = new User({
+      const new_user = new User({
           username: xss(req.username),
           email: xss(req.email),
       });
       new_user.password = new_user.generateHash(xss(req.password));
       new_user.save()
-          .then(()=>res.status(200).send())
-          .catch((e)=>res.status(500).send(e));
+          .then(()=>{
+            req.session.user = user.dataValues;
+            res.redirect('/dashboard');
+          })
+          .catch((e)=>{
+            res.redirect('/register');
+          });
     }else{
       
     }

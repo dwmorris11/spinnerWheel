@@ -1,9 +1,10 @@
 import React from 'react';
+import styled from 'styled-components';
 import Wheel from './wheel';
 import RandomType from './randomtype';
-import BarChart from './barchart.jsx';
-import styled from 'styled-components';
-import { getUser, removeUserSession } from '../utils/common.js';
+import BarChart from './barchart';
+import { getUser, removeUserSession } from '../utils/common';
+import 'regenerator-runtime/runtime';
 
 class Dashboard extends React.Component {
   constructor(props){

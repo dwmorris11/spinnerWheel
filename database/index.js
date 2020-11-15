@@ -1,6 +1,5 @@
 const { db } = require("./development.js");
 const mongoose = require('mongoose');
-mongoose.Promise = require('bluebird');
 
 const mongoUri = db.uri;
 const dbC = mongoose.connect(mongoUri, {
