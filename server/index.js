@@ -3,7 +3,6 @@ const express = require('express');
 const xss = require('xss');
 const helmet = require('helmet');
 const session = require('express-session');
-const { auth } = require('express-openid-connect');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const { User } = require('../database/schema.js');
@@ -32,12 +31,7 @@ app.use(session({
     resave: false,
     saveUninitialized: true
   }));
-  app.use(
-    auth({
-      required: req => req.originalUrl !== "/"
-    })
-  );
-
+ 
 app.use((req, res, next) => {
     if (req.cookies.user_sid && !req.session.user) {
         res.clearCookie('user_sid');        
@@ -57,7 +51,7 @@ app.get('/', sessionChecker, (req, res) => {
  * ******************************************************************************************/
 app.route('/register')
     .get(sessionChecker, (req, res) => {
-        res.sendFile(__dirname + '/public/register.html');
+        res.sendFile(__dirname + '../public/register.html');
     })
     .post((req, res) => {
        createUser(req, res);
@@ -70,40 +64,46 @@ app.route('/register')
             res.redirect('/register');
         });
 
-
 /********************************************************************************************
  * LOGIN
  * ******************************************************************************************/
 app.route('/login')
+    .get((req, res)=> {
+        res.sendFile(_dirname + '../public/login.html');
+    })
     .post((req, res) => {
         const username = xss(req.body.username);
         const password = xss(req.body.password);
-            User.findOne({username: username}, function(err, user) {
-                if (!user.validPassword(password)) {
-      
-                } else {
-                    // password matched. proceed forward
-                }
-  });
+        User.findOne({username: username}, function(err, user) {
+            if(!user){
+                res.statusCode(400).send('user not found');
+            }else if (!user.validPassword(password)) {
+                res.statusCode(400).send('invalid password');
+            } else {
+                res.session.user = user.dataValues;
+                res.redirect('/dashboard');
+            }
+        });
+    });
 
   /******************************************************************************************
    * MAKE NEW LIST/UPDATE
    ******************************************************************************************/
-  app.post('/update', function(req, res) {
-    const ListId = xss(req.body.listId);
-    const list = req.body.list;
-    for(let value of list){
-        if(validateWheelValue(value) !== undefined){
-            res.status(500).send(validateWheelValue(value));
-            return;
-        }
-    }
-
-
-  });
-
+  app.route('/update')
+    .post((req, res) => {
+        const ListId = xss(req.body.listId);
+        const list = req.body.list;
+            for(let value of list){
+                if(validateWheelValue(value) !== undefined){
+                    res.status(500).send(validateWheelValue(value));
+                    return;
+                }
+            }
+    })
+    .get((req, res)=> {
+        // TODO: add code to show list building page and get data from database
+    });
 
   app.listen(port, () => {
       console.log("Server listening on port: ", port);
   })
-});
