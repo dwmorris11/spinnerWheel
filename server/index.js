@@ -44,7 +44,10 @@ app.use(function (req, res, next) {
  * REGISTER A NEW USER
  * ******************************************************************************************/
 app.route('/register')
-    .post((req, res) => createUser(req, res));
+    .post((req, res) => {
+      createUser(req, res);
+    }
+  );
 
 /********************************************************************************************
  * LOGIN
@@ -71,8 +74,8 @@ app.route('/login')
                     message: 'Invalid password'});
             } 
             // TODO: get this from database
-            const token = generateToken(userData);
-            const userObj = getCleanUser(userData);
+            const token = generateToken(user);
+            const userObj = getCleanUser(user);
             res.json({user: userObj, token});
         });
     });
@@ -93,17 +96,17 @@ app.get('/verifyToken', function (req, res) {
       error: true,
       message: "Invalid token."
     });
- 
-    // return 401 status if the userId does not match.
-    if (user.id !== userData.id) {
-      return res.status(401).json({
-        error: true,
-        message: "Invalid user."
-      });
-    }
-    // get basic user details
-    var userObj = utils.getCleanUser(userData);
-    return res.json({ user: userObj, token });
+    User.findById(user.id, (err, user)=>{
+      if(err){
+        return res.status(401).json({
+          error: true,
+          message: "Invalid user."
+        });
+      }
+        // get basic user details
+      var userObj = utils.getCleanUser(user);
+      return res.json({ user: userObj, token });
+    });
   });
 });
 
@@ -133,12 +136,3 @@ app.get('/verifyToken', function (req, res) {
   app.listen(port, () => {
       console.log("Server listening on port: ", port);
   });
-
-  // static user details
-const userData = {
-    id: "789789",
-    password: "123456",
-    name: "Clue Mediator",
-    username: "cluemediator",
-    isAdmin: true
-  };

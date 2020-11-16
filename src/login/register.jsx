@@ -13,9 +13,11 @@ function Register({ history }) {
   const handleRegister = () => {
     setError(null);
     setLoading(true);
-    axios.post('http://localhost:4000/register', { username: username.value, password: password.value, email: email.value }).then(response => {
+    axios.post('http://localhost:4000/register', { username: username.value, password: password.value, email: email.value })
+    .then(response => {
       setLoading(false);
       setUserSession(response.data.token, response.data.user);
+      console.log(response);
       history.push('/dashboard');
     }).catch(error => {
       setLoading(false);
@@ -29,7 +31,7 @@ function Register({ history }) {
       Register<br /><br />
       <div>
         Username<br />
-        <input type="text" {...username} autoComplete="new-password" />
+        <input type="text" {...username} autoComplete="username" />
       </div>
       <div style={{ marginTop: 10 }}>
         Password<br />
@@ -37,7 +39,7 @@ function Register({ history }) {
       </div>
       <div style={{ marginTop: 10 }}>
         Email<br />
-        <input type="text" {...email} autoComplete="new-password" />
+        <input type="text" {...email} autoComplete="email" />
       </div>
       {error && <><small style={{ color: 'red' }}>{error}</small><br /></>}<br />
       <input type="button" value={loading ? 'Loading...' : 'Register'} onClick={handleRegister} disabled={loading} /><br />

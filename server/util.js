@@ -4,20 +4,20 @@ const { User } = require('../database/schema');
 const xss = require('xss');
 
 const createUser = async function(req, res) {
-    const isValidUser = validateUser(req.username, req.password);
-    const isValidEmail = validateEmail(req.username, req.email);
+    const isValidUser = validateUser(req.body.username, req.body.password);
+    const isValidEmail = validateEmail(req.body.username, req.body.email);
     if(isValidUser === undefined && isValidEmail === undefined){
       const new_user = new User({
-          username: xss(req.username),
-          email: xss(req.email),
+          username: xss(req.body.username),
+          email: xss(req.body.email),
       });
-      new_user.password = new_user.generateHash(xss(req.password));
+      new_user.password = new_user.generateHash(xss(req.body.password));
       new_user.save()
           .then(()=>{
-            req.session.user = user.dataValues;
-            res.redirect('/dashboard');
+            res.status(200).send();
           })
           .catch((e)=>{
+            console.error(e);
             res.redirect('/register');
           });
     }else{
@@ -31,10 +31,8 @@ function generateToken(user) {
     if (!user) return null;
    
     var u = {
-      userId: user.userId,
-      name: user.name,
       username: user.username,
-      isAdmin: user.isAdmin
+      email: user.email,
     };
    
     return jwt.sign(u, process.env.JWT_SECRET, {
@@ -47,10 +45,10 @@ function generateToken(user) {
     if (!user) return null;
    
     return {
-      userId: user.userId,
-      name: user.name,
+      id: user.id,
       username: user.username,
-      isAdmin: user.isAdmin
+      email: user.email,
+      lists: user.lists,
     };
   }
    
