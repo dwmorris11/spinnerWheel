@@ -73,7 +73,6 @@ app.route('/login')
                     error: true,
                     message: 'Invalid password'});
             } 
-            // TODO: get this from database
             const token = generateToken(user);
             const userObj = getCleanUser(user);
             res.json({user: userObj, token});

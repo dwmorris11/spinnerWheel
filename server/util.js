@@ -13,15 +13,19 @@ const createUser = async function(req, res) {
       });
       new_user.password = new_user.generateHash(xss(req.body.password));
       new_user.save()
-          .then(()=>{
-            res.status(200).send();
+          .then((data)=>{
+            res.status(200).send(getCleanUser(data));
           })
           .catch((e)=>{
             console.error(e);
             res.redirect('/register');
           });
     }else{
-      
+      if(isValidEmail !== undefined){
+        res.status(400).send(isValidEmail.email[0]);
+      }else if(isValidUser !== undefined){
+        res.status(400).send( isValidUser.join('\n'));
+      }
     }
 };
 

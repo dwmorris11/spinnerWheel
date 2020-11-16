@@ -16,12 +16,11 @@ function Register({ history }) {
     axios.post('http://localhost:4000/register', { username: username.value, password: password.value, email: email.value })
     .then(response => {
       setLoading(false);
-      setUserSession(response.data.token, response.data.user);
-      console.log(response);
+      setUserSession(response.data.token, response.data.username);
       history.push('/dashboard');
     }).catch(error => {
       setLoading(false);
-      if (error.response.status === 401) setError(error.response.data.message);
+      if (error.response.status === 401 || error.response.status === 400) setError(error.response.data);
       else setError("Something went wrong. Please try again later.");
     });
   }

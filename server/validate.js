@@ -13,7 +13,7 @@ const validateUser = function(username, password) {
                 pattern: /^[a-zA-Z0-9]+$/,  // alpha-num
                 message: function(value, attribute, validatorOptions, attributes, globalOptions) {
                     return validate.format(
-                        "^%{user} is not a valid username.  Must contain only letters and/or numbers and 8 characters long."
+                        " %{user} is not a valid username.  Must contain only letters and/or numbers and 8 characters long.\n"
                         ,
                         {
                             user: cleanedUsername,
@@ -23,13 +23,12 @@ const validateUser = function(username, password) {
         },
         password: {
         presence: true,
-        length: {minimum: 8},
+        length: {minimum: 8, maximum: 16},
         format: {
-            // minimum 2 upper, 2 lower, 2 numbers, 2 special characters
-            pattern: /\A(?=.*[A-Z].*[A-Z])(?=.*[a-z].*[a-z])(?=.*[0-9].*[0-9])(?=.*[^a-zA-Z0-9].*[^a-zA-Z0-9])/,
+            pattern: /^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^\w\d\s:])([^\s]){8,16}$/,
             message: function(value, attribute, validatorOptions, attributes, globalOptions) {
                 return validate.format(
-                    "^%{pass} isnot a valid password.  Must contain 8 chars, 2 numbers, 2 upper case letters, 2 lower case letters, and 2 special characters."
+                    " %{pass} is not a valid password. \n Must contain 8-16 chars, 1 numbers, 1 upper case letters, 1 lower case letters, and 1 special character.\n"
                     ,
                     {
                         pass: cleanedPassword,
@@ -38,15 +37,14 @@ const validateUser = function(username, password) {
             }
         }
     };
-
-    return validate({username: cleanedUsername, password: cleanedPassword});
+    return validate({username: cleanedUsername, password: cleanedPassword}, constraints, {format: "flat"});
 };
 
 const validateWheelValue = function(id, listId, wheelValue){
     const cleanedId = xss(id);
     const cleanedListId = xss(listId);
     const cleanedWheelValue = xss(wheelValue);
-    const wheelValueConstraints = {
+    const constraints = {
         id: {
             presence: true,
         },
@@ -60,7 +58,7 @@ const validateWheelValue = function(id, listId, wheelValue){
                 pattern: /^[a-zA-Z0-9]+$/, // alpha-num
                 message: function(value, attribute, validatorOptions, attributes, globalOptions) {
                     return validate.format(
-                        "^%{value} is not a valid.  Only alpha-numeric."
+                        " ^%{value} is not a valid.  Only alpha-numeric."
                         ,
                         {
                             value: cleanedWheelValue,
@@ -71,7 +69,7 @@ const validateWheelValue = function(id, listId, wheelValue){
         }
     }
 
-    return validate({id: cleanedId, listId: cleanedListId, wheelValue: cleanedWheelValue});
+    return validate({id: cleanedId, listId: cleanedListId, wheelValue: cleanedWheelValue}, constraints);
  };
 
  const validateEmail = function(username, email){
@@ -86,7 +84,7 @@ const validateWheelValue = function(id, listId, wheelValue){
          }
      };
 
-     return validate({username: cleanedUserName, email: cleanedEmail});
+     return validate({username: cleanedUserName, email: cleanedEmail}, constraints);
  }
 
 module.exports.validateUser = validateUser;
