@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt-nodejs');
+const SALT = 8;
 
 const schema= new mongoose.Schema({
   username: String,
@@ -12,7 +13,7 @@ const schema= new mongoose.Schema({
 });
 
 schema.methods.generateHash = function(password) {
-    return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+    return bcrypt.hashSync(password, bcrypt.genSaltSync(SALT), null);
 };
 
 schema.methods.validPassword = function(password) {
