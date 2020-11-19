@@ -3,6 +3,8 @@ import styled, { keyframes } from 'styled-components';
 
 function Wheel({names}) {
   const l = names.length;
+  const colors = ['red', 'yellow', 'green', 'blue'];
+  generateWheelGradient(l, colors);
    return (
      <PopUp>
       <Circle>
@@ -12,17 +14,47 @@ function Wheel({names}) {
         let divStyle = {
         left: left,
         top: top,
-        }
-        if(i === l-1){
+        };
+        if(i === 0){
           divStyle['color'] = 'red';
         }
-        return (<Icon id={name[0]} style={divStyle} key={name[0]+i}>{name[0]}</Icon>);
+        const rotation = (-90 + (360/l * i)).toString() + "deg";
+        let rotateStyle = {
+          "transform": `rotate(${rotation})`,
+        };
+        let colorWheelStyle = {
+          height: '75vh',
+          width: '75vh',
+          background: 'white',
+          background: `conic-gradient(${wheelGradient})`,
+        }
+      
+        return (<div><div><ColorWheel style={colorWheelStyle}></ColorWheel></div><Icon id={name[0]} style={divStyle} key={name[0]+i}>
+          <Name style={rotateStyle}>{name[0]}</Name></Icon></div>);
       })
       }
       </Circle>
     </PopUp>
+
    );
 }
+
+const generateWheelGradient = (numberOfWedges, colors) => {
+  const percentageOfWheel = 360/numberOfWedges;
+  let result = [];
+  for(let i = 0; i < numberOfWedges; i++) {
+    result.push(colors[i%colors.length]);
+    result.push(' ' + percentageOfWheel + '%');
+    if(i !== numberOfWedges - 1){
+      result.push(',');
+    }
+  }
+  return result;
+};
+
+const Name = styled.div`
+  font-size: 30px;
+`;
 
 const PopUp = styled.div`
   position: fixed;
@@ -36,7 +68,7 @@ const PopUp = styled.div`
   right: auto;
   display: block;
   transform: translate(-50%,-50%);
-  z-index: 10104;
+  z-index: 10000;
   box-shadow: 0 0 8px 0 rgba(0,0,0,.35);
 `;
 const Circle = styled.div`
@@ -68,7 +100,7 @@ const Icon = styled.div`
     margin-top: -30px;
     position: absolute;
     text-align: center;
-
+    z-index: 10005;
   &:hover {
     animation: ${pulse} 1s linear;
     animation-iteration-count: 1;
