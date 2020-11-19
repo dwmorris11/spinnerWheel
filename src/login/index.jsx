@@ -15,6 +15,8 @@ function Login({ history }) {
     axios.post('http://localhost:4000/login', { username: username.value, password: password.value }).then(response => {
       setLoading(false);
       setUserSession(response.data.token, response.data.user);
+      myStorage = window.localStorage;
+      myStorage.setItem("myjwt", response.data.token)
       history.push('/dashboard');
     }).catch(error => {
       setLoading(false);
