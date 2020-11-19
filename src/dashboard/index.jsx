@@ -37,6 +37,12 @@ class Dashboard extends React.Component {
     this.randomChange = this.randomChange.bind(this);
     this.findBarChartName = this.findBarChartName.bind(this);
   }
+  componentDidMount() {
+    let mjwt = window.localStorage.getItem("myjwt");
+    //here send the jwt to get confirmed by the server
+    //also make sure the jwt has a decent expiration date say 1 hour 
+    //so it can be valid even after an hour
+  }
 
   handleSpinClick(e){
     e.preventDefault();
