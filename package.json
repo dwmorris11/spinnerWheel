@@ -5,7 +5,7 @@
   "main": "./src/index.jsx",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --watch",
+    "build": "webpack",
     "start": "node ./server"
   },
   "repository": {
@@ -22,12 +22,12 @@
     "axios": "^0.21.0",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.19.0",
+    "connect-mongo": "^3.2.0",
     "cors": "^2.8.5",
     "d3": "^6.2.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "helmet": "^4.2.0",
-    "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.10.14",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
